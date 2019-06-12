@@ -1,0 +1,44 @@
+create PROCEDURE [dbo].[SP_Province]
+@Id int=0,
+@CountryId int =0,
+@ProvinceName varchar(50)=null,
+@CreatedBy int=0,
+@UpdateId int=0,
+@UpdatedBy int=0,
+ @action varchar(50) =''
+AS
+BEGIN
+if(@action='ProvinceList')
+	BEGIN
+		SELECT p.[Id]
+			  ,p.[CountryId]
+			  ,c.CountryName
+			  ,p.[ProvinceName]
+			  ,p.[CreatedBy]
+			  ,p.[CreatedDate]
+			  ,p.[UpdateId]
+			  ,p.[UpdatedDate]
+			  ,p.[IsActive]
+			  ,p.[IsDelete]
+		  FROM [dbo].[Provinces] as p
+		  inner join [dbo].[Countries] as c on c.Id=p.CountryId
+		   --where p.IsDelete='False' and p.IsActive='True'
+  END
+  
+	if(@action='checkduplicatedata')
+	BEGIN
+		SELECT  [Id],[ProvinceName]
+	    FROM [dbo].[Provinces] where ProvinceName LIKE '%'+@ProvinceName+'%' and IsDelete='False'
+	END
+
+		if(@action='InsertCountry')
+	BEGIN
+	Insert into Provinces(CountryId,ProvinceName,CreatedBy,CreatedDate,IsActive,IsDelete)
+	values(@CountryId,@ProvinceName,@CreatedBy,GETDATE(),'True','False')
+	END
+	
+
+END
+
+
+

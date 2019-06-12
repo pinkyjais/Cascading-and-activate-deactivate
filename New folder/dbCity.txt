@@ -1,0 +1,320 @@
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using static adminlte.Models.City;
+
+namespace adminlte.Classes
+{
+    public class dbCity
+    {
+        public static List<city> SearchcityList()
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            DataTable dt = new DataTable();
+            List<city> objdistrictlist = new List<city>();
+            try
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("SP_City", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@action", "CityList");
+                //cmd.Parameters.AddWithValue("d_Userid", userid);
+                dt.Load(cmd.ExecuteReader());
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    objdistrictlist.Add(new city
+                    {
+                        Id = Convert.ToInt32(dt.Rows[i]["Id"]),
+                        CountryId = Convert.ToInt32(dt.Rows[i]["CountryId"]),
+                        ProvinceId = Convert.ToInt32(dt.Rows[i]["ProvinceId"]),
+                        CountryName = Convert.ToString(dt.Rows[i]["CountryName"]),
+                        CityName = Convert.ToString(dt.Rows[i]["CityName"]),
+                        ProvinceName = Convert.ToString(dt.Rows[i]["ProvinceName"]),
+                        IsDelete = Convert.ToString(dt.Rows[i]["IsDelete"]),
+                        IsActive = Convert.ToString(dt.Rows[i]["IsActive"]),
+                    });
+                }
+                return objdistrictlist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                dt.Dispose();
+            }
+        }
+
+        public DataSet CheckDuplicateData(city objcity)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("SP_checkduplicatedata", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            //cmd.Parameters.AddWithValue("@action", "checkduplicatedata");
+            //cmd.Parameters.AddWithValue("@Id", objcity.Id);
+            cmd.Parameters.AddWithValue("@Name", objcity.Name);
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            adpt.Fill(ds);
+            return ds;
+        }
+
+        public bool InsertData(city objcountry)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            //string country_id = string.Empty;
+            int country_id = 0;
+            try
+            {
+                Get_Country();
+                Get_State(country_id);
+                SqlCommand cmd = new SqlCommand("SP_City", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@action", "InsertCity");
+                cmd.Parameters.AddWithValue("@ProvinceId", objcountry.ProvinceId);
+                cmd.Parameters.AddWithValue("@Name", objcountry.CityName);
+                cmd.Parameters.AddWithValue("@CountryId", objcountry.CountryId);
+                cmd.Parameters.AddWithValue("@CreatedBy", objcountry.CreatedBy);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public static List<city> CityFromProvince()
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            DataTable dt = new DataTable();
+            List<city> objdistrictlist = new List<city>();
+            try
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("SP_City", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@action", "CityList");
+                //cmd.Parameters.AddWithValue("d_Userid", userid);
+                dt.Load(cmd.ExecuteReader());
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    objdistrictlist.Add(new city
+                    {
+                        Id = Convert.ToInt32(dt.Rows[i]["Id"]),
+                        CountryId = Convert.ToInt32(dt.Rows[i]["CountryId"]),
+                        ProvinceId = Convert.ToInt32(dt.Rows[i]["ProvinceId"]),
+                        CountryName = Convert.ToString(dt.Rows[i]["CountryName"]),
+                        CityName = Convert.ToString(dt.Rows[i]["CityName"]),
+                        ProvinceName = Convert.ToString(dt.Rows[i]["ProvinceName"]),
+                        //State = Convert.ToInt32(dt.Rows[i]["State"]),
+                    });
+                }
+                return objdistrictlist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                dt.Dispose();
+            }
+        }
+
+        public DataSet SearchDataForUpdate(int id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("SP_City_Edit", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            //cmd.Parameters.AddWithValue("@action", "selectById");
+            cmd.Parameters.AddWithValue("@Id", id);
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            adpt.Fill(ds);
+            return ds;
+        }
+
+        public bool UpdateData(city objUser)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_City_Update", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                //cmd.Parameters.AddWithValue("@action", "UpdateProvince");
+                cmd.Parameters.AddWithValue("@Id", objUser.Id);
+                cmd.Parameters.AddWithValue("@Name", objUser.Name);
+                cmd.Parameters.AddWithValue("@ProvinceId", objUser.ProvinceId);
+                cmd.Parameters.AddWithValue("@CountryId", objUser.CountryId);
+                cmd.Parameters.AddWithValue("@UpdatedBy", objUser.UpdatedBy);
+                cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public DataSet SearchUserForUpdate(int id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("SP_Province", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@action", "selectById");
+            cmd.Parameters.AddWithValue("@Id", id);
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            adpt.Fill(ds);
+            return ds;
+        }
+
+        public DataSet Get_Country()
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("GetActivatedCountry", con);
+            //cmd.Parameters.AddWithValue("@action", "CountryList");
+            cmd.CommandType = CommandType.StoredProcedure;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            return ds;
+        }
+
+        public DataSet Get_State(int country_id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("GetActivatedProvincebyCountryId", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@CountryId", country_id);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            return ds;
+
+        }
+
+        public bool makeDeactivateData(city objcity)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("GetDeactivatedCity", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Id", objcity.Id);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public bool makeActivateData(city objcity)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("ActivateDeactivatedCity", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Id", objcity.Id);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public DataSet Get_City_By_State(int province_id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("GetActivatedCitybyProvinceId", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ProvinceId", province_id);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            return ds;
+
+        }
+
+        public DataSet Get_District_By_State(int province_id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("GetActivatedDistrictbyProvinceId", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ProvinceId", province_id);
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            da.Fill(ds);
+            return ds;
+
+        }
+
+        public static List<city> CityFromPovince(int id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            DataTable dt = new DataTable();
+            List<city> citylist = new List<city>();
+            try
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("GetActivatedCitybyProvinceId", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@ProvinceId", id);
+                //cmd.Parameters.AddWithValue("@action", "selectCntryById");
+                dt.Load(cmd.ExecuteReader());
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    citylist.Add(new city
+                    {
+                        Id = Convert.ToInt32(dt.Rows[i]["Id"]),
+                        //CountryId = Convert.ToInt32(dt.Rows[i]["CountryId"]),
+                        // CountryName = Convert.ToString(dt.Rows[i]["CountryName"]),
+                        CityName = Convert.ToString(dt.Rows[i]["CityName"]),
+                        //State = Convert.ToInt32(dt.Rows[i]["State"]),
+                    });
+                }
+                return citylist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                dt.Dispose();
+            }
+        }
+    }
+}

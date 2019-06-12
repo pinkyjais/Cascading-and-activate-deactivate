@@ -1,0 +1,23 @@
+create PROCEDURE [dbo].[SP_Province_Update]
+@Id int=0,
+@CountryId int=0,
+@ProvinceName varchar(50)=null,
+@CreatedBy int=0,
+@UpdateId int=0,
+@UpdatedDate datetime ='',
+@UpdatedBy int=0
+AS
+BEGIN
+
+BEGIN
+UPDATE [dbo].[Provinces]
+SET
+	ProvinceName = @ProvinceName,
+	CountryId=@CountryId,
+	UpdateId = @UpdatedBy,
+	UpdatedDate = GETDATE(),
+	[IsActive] = 1,
+	[IsDelete] = 0 
+WHERE Id = @Id
+END	
+END

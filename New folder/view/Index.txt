@@ -1,0 +1,360 @@
+@model adminlte.Models.Company.companylist
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css" />
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            @*<ol class="breadcrumb">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">User Management</a></li>
+                    <li class="active">All User</li>
+                </ol>*@
+        </div>
+    </div>
+    <section class="content-header">
+        <h1>
+            Company
+        </h1>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        @*<div style="background-color:white">
+                <div class="input-group">
+                    <div class="input-group-addon">
+                        <i class="fa fa-search"></i>
+                    </div>
+                    <input type="text" id="txtglobalsearch" class="form-control" placeholder="Search User" />
+                    <div class="input-group-addon">
+                        <i class="fa fa-remove" id="clearSearch"></i>
+                    </div>
+                </div>
+            </div>*@
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Company List</h3>
+                        <div class="pull-right">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <a href="/Company/AddCompany" class="btn btn-primary"><i class="fa fa-plus"></i>Add New</a>
+                                </div>
+                                <div class="col-md-7" style="display:none">
+                                    <select id="ddlfilterby" class="form-control">
+                                        <option value="0">Filter By</option>
+                                        <option value="5">Location</option>
+                                        <option value="4">User Role</option>
+                                        <option value="1">Name</option>
+                                        <option value="2">Username</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.box-header -->
+
+                    <div class="box-body table-responsive">
+                        <table id="example2" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Sr No</th>
+                                    <th>CompanyName</th>
+                                    @*<th>Logo</th>
+                                   <th>Country</th>
+                                   <th>Province</th>
+                                   <th>City</th>
+                                   <th>District</th>*@
+                                    <th>Email</th>
+                                    @*<th>Fax</th>*@
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    @*<th>Mobile No.</th>
+                                    <th>Licence</th>
+                                    <th>Tax Id</th>
+                                    <th>Transaction Type</th>
+                                    <th>IATA</th>
+                                    <th>Commercial Record</th>*@
+                                    <th data-orderable="false" style="width:26%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reload">
+                                @*to check that model is not null*@
+                                @if (Model.objcompanymanagementlist != null)
+                                {
+                                    int i = 0;
+                                    foreach (var item in Model.objcompanymanagementlist)
+                                    {
+                                        i = i + 1;
+                                <tr>
+                                    @*<td>@i</td>
+                                      <td>@item.company_name</td>
+                                      <td>@item.logo</td>
+                                      <td>@item.CountryName</td>
+                                      <td>@item.ProvinceName</td>
+                                      <td>@item.DistrictName</td>
+                                      <td>@item.CityName</td>
+                                      <td>@item.address</td>
+                                      <td>@item.email</td>
+                                      <td>@item.fax</td>
+                                      <td>@item.phone</td>
+                                      <td>@item.mobile</td>
+                                      <td>@item.license_no</td>
+                                      <td>@item.tax_id</td>
+                                      <td>@item.transation_type</td>
+                                      <td>@item.iata</td>
+                                      <td>@item.commertial_records</td>*@
+                                    <td>@i</td>
+                                    <td>@item.company_name</td>
+                                    <td>@item.email</td>
+                                    <td> @item.phone</td>
+                                    <td> @item.address</td>
+                                    <td style="width:26%">
+                                        @*<a onclick="Edit(@item.id)" class="btn btn-primary"><i class="fa fa-pencil"></i></a>*@
+                                        <a href="/Company/AddCompany/@item.id" class="btn btn-primary"><i class="fa fa-pencil"></i>Edit</a>
+                                        <a href="/Company/DeleteComapny/@item.id" onclick="return confirm('Are you sure you want to Delete this user?');" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                        @if (Model.objcompanymanagementlist != null)
+                                        {
+                                            <div class="col-md-4 col-xs-12">
+                                                <a onclick="ViewLoginDetail('@item.company_name','@item.logo','@item.CountryName','@item.ProvinceName','@item.DistrictName','@item.CityName','@item.address','@item.email','@item.fax','@item.phone','@item.mobile','@item.license_no','@item.tax_id','@item.transation_type','@item.iata','@item.commertial_records')" style="margin-left:-7px" class="btn btn-success"><i class="fa fa-eye"></i> View</a>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="col-md-4 col-xs-12">
+                                                <a disabled="disabled" onclick="ViewLoginDetail('@item.company_name','@item.email','@item.phone','@item.address')" style="margin-left:-7px" class="btn btn-success disabled"><i class="fa fa-eye"></i> View</a>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </section>
+    <div class="modal fade" id="ViewLoginDetails">
+        <div class="modal-dialog">
+            <div class="content modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="modaltitle">Company Details</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Company Name:</label>
+                            <label id="lblCompany"></label>
+                          </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">Logo:</label>
+                                <label id="lblLogo"></label>
+                           </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Country:</label>
+                            <label id="lblCountry"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Province:</label>
+                            <label id="lblProvince"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">District:</label>
+                            <label id="lblDistrict"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">City:</label>
+                            <label id="lblCity"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Address:</label>
+                            <label id="lblAddress"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Email:</label>
+                            <label id="lblEmail"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Fax:</label>
+                            <label id="lblFax"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Phone:</label>
+                            <label id="lblPhone"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Mobile:</label>
+                            <label id="lblMobile"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">license_no:</label>
+                            <label id="lbllicense_no"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">tax_id:</label>
+                            <label id="lbltax_id"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">transation_type:</label>
+                            <label id="lbltransation_type"></label>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">iata:</label>
+                            <label id="lbliata"></label>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">commertial_records:</label>
+                                <label id="lblcommertial_records"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.content -->
+</div>
+@section scripts
+{
+    <script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js" type="text/javascript"></script>
+
+
+    @*<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.js"></script>*@
+
+    @*<script src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap4.min.js "></script>*@
+    <script type="text/javascript">
+                function Edit(id) {
+
+            $.ajax({
+                url: "/Comapny/getuserdetails",
+                type: "GET",
+                contentType: false,
+                processData: false,
+                data: { id: id },
+                success: function (result, status, xhr) {
+                    var obj = null;
+                    try {
+                        obj = JSON.parse(result);
+                    } catch (e) {
+                        var elements = $(result);
+                        var found = $('#isunauthorized', elements);
+                        // to check that user has rights for this page access
+                        if (found.length > 0) {
+                            window.location.href = "/login/UnAuthorized";
+                        }
+                    }
+                    // to check that result is not blank
+                    if (result != "") {
+                        // check that obj is not null
+                        window.location.href = "/Company/AddCompany";
+                        if (obj != null && obj.length > 0) {
+                            $('.h1Header').text("Edit User");
+                            $('#txtCompanyname').val(obj[0].company_name);
+                            $('#txtAddress').val(obj[0].address);
+                            $('#VwCountriesList').val(obj[0].country);
+                            $('#ddlstate').val(obj[0].province);
+                            $('#ddldistrict').val(obj[0].district);
+                            $('#ddlcity').val(obj[0].city_state);
+                            $('#txtContact1').val(obj[0].phone);
+                            $('#txtEmail').val(obj[0].email);
+                            $('#txtFax').val(obj[0].fax);
+                            $('#txtContact2').val(obj[0].mobile);
+                            $('#txtTransation').val(obj[0].transation_type);
+                            $('#txtTax').val(obj[0].tax_id);
+                            $('#txtLicense').val(obj[0].license_no);
+                            $('#txtIATA').val(obj[0].iata);
+                            $('#txtCommertial').val(obj[0].commertial_records);
+                            $('#hdnUserid').val(obj[0].ID);
+                            $('#imgProfilePic').attr('src', obj[0].logo);
+                            $('#hdnimagename').val(obj[0].picname);
+                        }
+                    }
+                },
+                complete: function () {
+                    $('.select2').select2();
+                },
+                error: function () {
+                }
+            });
+
+            //getDropdown();
+            //$("#btnSave").show();
+            //$("#btnEdit").hide();
+            //$("#divLoader").hide();
+            //return false;
+
+        }
+        function ViewLoginDetail(lblCompany, lblLogo, lblCountry, lblProvince, lblDistrict, lblCity, lblAddress, lblEmail, lblFax, lblPhone, lblMobile, lbllicense_no, lbltax_id, lbltransation_type, lbliata, lblcommertial_records) {
+            $('#lblCompany').text(lblCompany);
+            $('#lblLogo').text(lblLogo);
+            $('#lblCountry').text(lblCountry);
+            $('#lblProvince').text(lblProvince);
+            $('#lblDistrict').text(lblDistrict);
+            $('#lblCity').text(lblCity);
+            $('#lblAddress').text(lblAddress);
+            $('#lblEmail').text(lblEmail);
+            $('#lblFax').text(lblFax);
+            $('#lblPhone').text(lblPhone);
+            $('#lblMobile').text(lblMobile);
+            $('#lbllicense_no').text(lbllicense_no);
+            $('#lbltax_id').text(lbltax_id);
+            $('#lbltransation_type').text(lbltransation_type);
+            $('#lbliata').text(lbliata);
+            $('#lblcommertial_records').text(lblcommertial_records);
+
+            $('#ViewLoginDetails').modal('toggle');
+        }
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            addrow();
+        });
+        function addrow() {
+            $("#example2").DataTable({
+
+                //"columnDefs": [{
+                //    "targets": [0],
+                //    "visible": false,
+                //    "searchable": false
+                //},
+                //{
+                //    "targets": [7],
+                //    "searchable": false,
+                //    "orderable": false
+                //},
+                //{
+                //    "targets": [8],
+                //    "searchable": false,
+                //    "orderable": false
+                //},
+                //{
+                //    "targets": [9],
+                //    "searchable": false,
+                //    "orderable": false
+                //}],
+            });
+        }
+    </script>
+
+
+
+}
+
+

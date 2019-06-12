@@ -1,0 +1,17 @@
+
+Create procedure [dbo].[SP_checkduplicatedata]
+@Id int=0,
+@Name varchar(50)=null,
+@ProvinceId int=0,
+@CreatedBy int=0,
+@UpdatedBy int=0,
+@CountryId int=0
+as begin
+SELECT  [Id]
+		,[Name]
+      
+	  FROM [dbo].[Cities] where Name LIKE '%'+@Name+'%'
+	  end
+
+
+

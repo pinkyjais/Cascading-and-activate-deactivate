@@ -1,0 +1,225 @@
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using static adminlte.Models.Province;
+
+namespace adminlte.Classes
+{
+    public class dbProvince
+    {
+        public static List<province> SearchprovinceList()
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            DataTable dt = new DataTable();
+            List<province> objprovincelist = new List<province>();
+            try
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("SP_Province", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@action", "ProvinceList");
+                dt.Load(cmd.ExecuteReader());
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    objprovincelist.Add(new province
+                    {
+                        Id = Convert.ToInt32(dt.Rows[i]["Id"]),
+                        //CountryId = Convert.ToInt32(dt.Rows[i]["CountryId"]),
+                        //CountryName = Convert.ToString(dt.Rows[i]["CountryName"]),
+                        ProvinceName = Convert.ToString(dt.Rows[i]["ProvinceName"]),
+                        IsDelete = Convert.ToString(dt.Rows[i]["IsDelete"]),
+                        IsActive = Convert.ToString(dt.Rows[i]["IsActive"]),
+                    });
+                }
+                return objprovincelist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                dt.Dispose();
+            }
+        }
+
+
+        public DataSet CheckDuplicateData(province objprovince)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("SP_Province", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@action", "checkduplicatedata");
+           // cmd.Parameters.AddWithValue("@CountryId", objprovince.CountryId);
+            cmd.Parameters.AddWithValue("@ProvinceName", objprovince.ProvinceName);
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            adpt.Fill(ds);
+            return ds;
+        }
+
+        public bool InsertData(province objcountry)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_Province", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@action", "InsertCountry");
+                cmd.Parameters.AddWithValue("@CountryId", objcountry.CountryId);
+                cmd.Parameters.AddWithValue("@ProvinceName", objcountry.ProvinceName);
+                cmd.Parameters.AddWithValue("@CreatedBy", objcountry.CreatedBy);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+ 
+
+        public DataSet SearchDataForUpdate(int id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("SP_Province_Edit", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            //cmd.Parameters.AddWithValue("@action", "selectById");
+            cmd.Parameters.AddWithValue("@Id", id);
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            adpt.Fill(ds);
+            return ds;
+        }
+
+        public bool UpdateData(province objUser)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_Province_Update", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                //cmd.Parameters.AddWithValue("@action", "UpdateProvince");
+                cmd.Parameters.AddWithValue("@Id", objUser.Id);          
+                cmd.Parameters.AddWithValue("@ProvinceName", objUser.ProvinceName);
+                cmd.Parameters.AddWithValue("@CountryId", objUser.CountryId);
+                cmd.Parameters.AddWithValue("@UpdateId", objUser.UpdateBy);
+                cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+        public static List<province> ProvinceFromCountry(int id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            DataTable dt = new DataTable();
+            List<province> provincelist = new List<province>();
+            try
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("GetActivatedProvincebyCountryId", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@CountryId", id);
+                //cmd.Parameters.AddWithValue("@action", "selectCntryById");
+                dt.Load(cmd.ExecuteReader());
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    provincelist.Add(new province
+                    {
+                        Id = Convert.ToInt32(dt.Rows[i]["Id"]),
+                        //CountryId = Convert.ToInt32(dt.Rows[i]["CountryId"]),
+                       // CountryName = Convert.ToString(dt.Rows[i]["CountryName"]),
+                        ProvinceName = Convert.ToString(dt.Rows[i]["ProvinceName"]),
+                        //State = Convert.ToInt32(dt.Rows[i]["State"]),
+                    });
+                }
+                return provincelist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                dt.Dispose();
+            }
+        }
+        
+
+        public DataSet SearchUserForUpdate(int id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("SP_Province", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@action", "selectById");
+            cmd.Parameters.AddWithValue("@Id", id);
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            adpt.Fill(ds);
+            return ds;
+        }
+
+        public bool makeDeactivateData(province objprovince)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("GetDeactivatedProvince", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Id", objprovince.Id);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public bool makeActivateData(province objprovince)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("ActivateDeactivatedProvince", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Id", objprovince.Id);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+    }
+}

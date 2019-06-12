@@ -1,0 +1,330 @@
+using adminlte.Classes;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Script.Serialization;
+using static adminlte.Models.City;
+using static adminlte.Models.Company;
+using static adminlte.Models.District;
+using static adminlte.Models.Province;
+
+namespace adminlte.Controllers
+{
+    public class CompanyController : Controller
+    {
+       
+        dbCity objdbcity = new dbCity();
+        dbCompanyManagement objCompanyManagemenlist = new dbCompanyManagement();
+        string Result = string.Empty;
+        // GET: ContentMangement
+        public ActionResult Index()
+        {
+            companylist objcompanymanagementlist = new companylist();
+            objcompanymanagementlist.objcompanymanagementlist = dbCompanyManagement.SearchCompanyManagementList();
+            return View(objcompanymanagementlist);
+        }
+        public ActionResult AddCompany()
+        {
+            try
+            {
+               
+                List<SelectListItem> Countries = dbCountry.SearchCountryList().Select(c => new SelectListItem
+                {
+                    Value = Convert.ToString(c.Id),
+                    Text = c.CountryName
+                }).ToList();
+                Countries.Insert(0, new SelectListItem { Value = "0", Text = "Select Country" });
+                ViewBag.IsOtherUser = 0;
+                ViewBag.VwCountriesList = Countries;
+
+                List<SelectListItem> Provinces = dbProvince.SearchprovinceList().Select(c => new SelectListItem
+                {
+                    Value = Convert.ToString(c.Id),
+                    Text = c.ProvinceName
+
+                }).ToList();
+                Provinces.Insert(0, new SelectListItem { Value = "0", Text = "Select Province" });
+                ViewBag.VwProvincesList = Provinces;
+
+                List<SelectListItem> Districts = dbDistrict.SearchdistrictList().Select(c => new SelectListItem
+                {
+                    Value = Convert.ToString(c.Id),
+                    Text = c.DistrictName
+
+                }).ToList();
+                Districts.Insert(0, new SelectListItem { Value = "0", Text = "Select District" });
+                ViewBag.VwDistrictsList = Districts;
+
+
+
+
+                List<SelectListItem> Cities = dbCity.SearchcityList().Select(c => new SelectListItem
+                {
+                    Value = Convert.ToString(c.Id),
+                    Text = c.CityName
+
+                }).ToList();
+                Cities.Insert(0, new SelectListItem { Value = "0", Text = "Select City" });
+                ViewBag.VwCitiesList = Cities;
+
+                
+                return View();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        
+
+
+        [HttpPost]
+        //[CustomAuthorize("user-edit")]
+        public string BindStateByCountry(province pr)
+        {
+            try
+            {
+                var str = "";
+                DataSet ds = objdbcity.Get_State(pr.CountryId);
+                List<SelectListItem> statelist = new List<SelectListItem>();
+                List<province> pro = new List<province>();
+                if (ds.Tables[0].Rows.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        province po = new province();
+                        po.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
+                        po.ProvinceName = Convert.ToString(ds.Tables[0].Rows[i]["ProvinceName"]);
+                        pro.Add(po);
+                    }
+                }
+                else
+                {
+                    return str;
+                }
+                //return Json(statelist, JsonRequestBehavior.AllowGet);
+                var jsonSerialiser = new JavaScriptSerializer();
+                str = jsonSerialiser.Serialize(pro);
+                return str;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [HttpPost]
+        //[CustomAuthorize("user-edit")]
+        public string BindCityByState(city ct)
+        {
+            try
+            {
+                var str = "";
+                DataSet ds = objdbcity.Get_City_By_State(ct.ProvinceId);
+                List<city> cro = new List<city>();
+                if (ds.Tables.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        city c = new city();
+                        c.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
+                        c.CityName = Convert.ToString(ds.Tables[0].Rows[i]["CityName"]);
+                        cro.Add(c);
+                    }
+                }
+                else
+                {
+                    return str;
+                }
+                //return Json(statelist, JsonRequestBehavior.AllowGet);
+                var jsonSerialiser = new JavaScriptSerializer();
+                str = jsonSerialiser.Serialize(cro);
+                return str;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [HttpPost]
+        //[CustomAuthorize("user-edit")]
+        public string BindDitrictByState(district ct)
+        {
+            try
+            {
+                var str = "";
+                DataSet ds = objdbcity.Get_District_By_State(ct.ProvinceId);
+                List<district> cro = new List<district>();
+                if (ds.Tables.Count > 0)
+                {
+                    for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                    {
+                        district c = new district();
+                        c.Id = Convert.ToInt32(ds.Tables[0].Rows[i]["Id"]);
+                        c.DistrictName = Convert.ToString(ds.Tables[0].Rows[i]["DistrictName"]);
+                        cro.Add(c);
+                    }
+                }
+                else
+                {
+                    return str;
+                }
+                //return Json(statelist, JsonRequestBehavior.AllowGet);
+                var jsonSerialiser = new JavaScriptSerializer();
+                str = jsonSerialiser.Serialize(cro);
+                return str;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+
+
+        [HttpPost]
+        public string SaveCompanyDetails(company emp)
+        {
+            try
+            {
+                string str = "";
+                company objemplist = new company();
+                //if empid ==0 then insert else update details
+                if (emp.id == 0)
+                {
+                    HttpFileCollectionBase files = Request.Files;
+                    string fname = string.Empty;
+                    string StorePath = string.Empty;
+                    for (int j = 0; j < files.Count; j++)
+                    {
+                        HttpPostedFileBase file = files[j];
+                        var fileextension = Path.GetExtension(file.FileName);
+                        var filename = Guid.NewGuid();
+                        fname = filename + fileextension;
+                        objemplist.picname = fname;
+                        emp.logo = fname;
+                        fname = Path.Combine(Server.MapPath("~/Images/"), fname);
+                        objemplist.logo = "~/../../../Images/" + objemplist.picname;
+                        StorePath = Server.MapPath("~/Images/");
+                        //to check that directory exists or not
+                        if (!Directory.Exists(StorePath))
+                        {
+                            Directory.CreateDirectory(StorePath);
+                        }
+                        file.SaveAs(fname);
+                    }
+                    emp.created_by = Convert.ToInt32(Session["UserId"]);
+                    //emp.updated_by = Convert.ToInt32(Session["UserId"]);
+                    dbCompanyManagement.AddCompany(emp);
+                }
+                else
+                {
+                    HttpFileCollectionBase files = Request.Files;
+                    string fname = string.Empty;
+                    string StorePath = string.Empty;
+                    //check if there is file in fileupload control to save file in folder
+                    if (files.Count > 0)
+                    {
+                        for (int j = 0; j < files.Count; j++)
+                        {
+                            HttpPostedFileBase file = files[j];
+                            var fileextension = Path.GetExtension(file.FileName);
+                            var filename = Guid.NewGuid();
+                            fname = filename + fileextension;
+                            objemplist.picname = fname;
+                            emp.logo = fname;
+                            fname = Path.Combine(Server.MapPath("~/Images/"), fname);
+                            objemplist.picname = "~/../../../Images/" + objemplist.picname;
+                            StorePath = Server.MapPath("~/Images/");
+                            //to check that directory exists or not
+                            if (!Directory.Exists(StorePath))
+                            {
+                                Directory.CreateDirectory(StorePath);
+                            }
+                            file.SaveAs(fname);
+                        }
+                    }
+                    //emp.created_by = Convert.ToInt32(Session["UserId"]);
+                    emp.updated_by = Convert.ToInt32(Session["UserId"]);
+                    dbCompanyManagement.UpdateCompany(emp);
+                }
+                ////to check that email is checked in ui of yse the send email to the user
+                //if (users.remark == "1")
+                //{
+                //    sendmail(users.email, users.user_name, users.password);
+                //}
+                var jsonSerialiser = new JavaScriptSerializer();
+                str = jsonSerialiser.Serialize(objemplist);
+                return str;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        [HttpPost]
+        //[CustomAuthorize("user-edit")]
+        public string getuserdetails(company emp)
+        {
+            try
+            {
+                var str = "";
+                List<company> objuserlist = new List<company>();
+                // to check that variable is not adduser
+                if (emp.urlstr.Trim().ToLower() != "addcompany")
+                {
+                    var urlarray = emp.urlstr.Split('?');
+                    //var decryptedstring = Application_Logic.Common.Decrypt(urlarray[0]);
+                    //to check that descrpted is not blank
+                    //if (decryptedstring != "")
+                    //{
+                    emp.id = Convert.ToInt32(urlarray[0].ToString());
+                    //}
+                    objuserlist = dbCompanyManagement.SearchCompanyByID(Convert.ToInt32(emp.id));
+                    //to check userresponse count 
+                    if (objuserlist.Count > 0)
+                    {
+                        var imagename = objuserlist[0].logo;
+                        objuserlist[0].picname = imagename;
+                        // to check that image name is not blank if blank then default image is setted
+                        if (objuserlist[0].picname != "")
+                        {
+                            objuserlist[0].logo = "~/../../../Images/" + objuserlist[0].logo;
+                        }
+                        else
+                        {
+                            objuserlist[0].logo = "~/../../../Content/adminlte/img/nouser.jpg";
+                        }
+                    }
+                    var jsonSerialiser = new JavaScriptSerializer();
+                    str = jsonSerialiser.Serialize(objuserlist);
+                }
+                return str;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public ActionResult Delete(int id)
+        {
+            try
+            {
+                objCompanyManagemenlist.DeleteComapny(id, Convert.ToInt32(Session["UserId"]));
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+    }
+}

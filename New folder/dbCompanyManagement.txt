@@ -1,0 +1,209 @@
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using static adminlte.Models.Company;
+
+namespace adminlte.Classes
+{
+    public class dbCompanyManagement
+    {
+        public static List<company> SearchCompanyManagementList()
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            DataTable dt = new DataTable();
+            List<company> objcompanylist = new List<company>();
+            try
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("sp_CompanyList", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                //cmd.Parameters.AddWithValue("d_Userid", userid);
+                dt.Load(cmd.ExecuteReader());
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    objcompanylist.Add(new company
+                    {
+                        id = Convert.ToInt32(dt.Rows[i]["id"]),
+                        company_name = Convert.ToString(dt.Rows[i]["company_name"]),
+                        CountryName = Convert.ToString(dt.Rows[i]["CountryName"]),
+                        DistrictName = Convert.ToString(dt.Rows[i]["DistrictName"]),
+                        ProvinceName = Convert.ToString(dt.Rows[i]["ProvinceName"]),
+                        CityName = Convert.ToString(dt.Rows[i]["Name"]),
+                        logo = Convert.ToString(dt.Rows[i]["logo"]),
+                        country = Convert.ToInt32(dt.Rows[i]["country"]),
+                        province = Convert.ToInt32(dt.Rows[i]["province"]),
+                        district = Convert.ToInt32(dt.Rows[i]["district"]),
+                        city_state = Convert.ToInt32(dt.Rows[i]["city_state"]),
+                        address = Convert.ToString(dt.Rows[i]["address"]),
+                        email = Convert.ToString(dt.Rows[i]["email"]),
+                        fax = Convert.ToString(dt.Rows[i]["fax"]),
+                        phone = Convert.ToString(dt.Rows[i]["phone"]),
+                        mobile = Convert.ToString(dt.Rows[i]["mobile"]),
+                        license_no = Convert.ToString(dt.Rows[i]["license_no"]),
+                        tax_id = Convert.ToString(dt.Rows[i]["tax_id"]),
+                        transation_type = Convert.ToString(dt.Rows[i]["transation_type"]),
+                        iata = Convert.ToString(dt.Rows[i]["iata"]),
+                        commertial_records = Convert.ToString(dt.Rows[i]["commertial_records"]),
+                       
+                       
+                    });
+                }
+                return objcompanylist;
+            }
+            catch (Exception EX)
+            {
+                throw EX;
+            }
+            finally
+            {
+                dt.Dispose();
+            }
+        }
+
+        public static void AddCompany(company emps)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            try
+            {
+                SqlCommand cmd = new SqlCommand("sp_insert_company", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@company_name", emps.company_name);
+                cmd.Parameters.AddWithValue("@logo", emps.logo);
+                cmd.Parameters.AddWithValue("@country", emps.country);
+                cmd.Parameters.AddWithValue("@district", emps.district);
+                cmd.Parameters.AddWithValue("@city_state", emps.city_state);
+                cmd.Parameters.AddWithValue("@province", emps.province);
+                cmd.Parameters.AddWithValue("@address", emps.address);
+                cmd.Parameters.AddWithValue("@phone", emps.phone);
+                cmd.Parameters.AddWithValue("@email", emps.email);
+                cmd.Parameters.AddWithValue("@fax", emps.fax);
+                cmd.Parameters.AddWithValue("@mobile", emps.mobile);
+                cmd.Parameters.AddWithValue("@tax_id", emps.tax_id);
+                cmd.Parameters.AddWithValue("@license_no", emps.license_no);
+                cmd.Parameters.AddWithValue("@commertial_records", emps.commertial_records);
+                cmd.Parameters.AddWithValue("@iata", emps.iata);
+                cmd.Parameters.AddWithValue("@transation_type", emps.transation_type);
+                cmd.Parameters.AddWithValue("@created_by", emps.created_by);
+                cmd.Parameters.AddWithValue("@created_date", DateTime.Now);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public static void UpdateCompany(company emps)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            try
+            {
+                SqlCommand cmd = new SqlCommand("sp_update_company", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id", emps.id);
+                cmd.Parameters.AddWithValue("@company_name", emps.company_name);
+                cmd.Parameters.AddWithValue("@logo", emps.logo);
+                cmd.Parameters.AddWithValue("@address", emps.address);
+                cmd.Parameters.AddWithValue("@country", emps.country);
+                cmd.Parameters.AddWithValue("@province", emps.province);
+                cmd.Parameters.AddWithValue("@city_state", emps.city_state);
+                cmd.Parameters.AddWithValue("@district", emps.district);
+                cmd.Parameters.AddWithValue("@phone", emps.phone);
+                cmd.Parameters.AddWithValue("@transation_type", emps.transation_type);
+                cmd.Parameters.AddWithValue("@fax", emps.fax);
+                cmd.Parameters.AddWithValue("@mobile", emps.mobile);
+                cmd.Parameters.AddWithValue("@email", emps.email);
+                cmd.Parameters.AddWithValue("@iata", emps.iata);
+                cmd.Parameters.AddWithValue("@commertial_records", emps.commertial_records);
+                cmd.Parameters.AddWithValue("@license_no", emps.license_no);
+                cmd.Parameters.AddWithValue("@tax_id", emps.tax_id);
+                cmd.Parameters.AddWithValue("@updated_date", DateTime.Now);
+                cmd.Parameters.AddWithValue("@updated_by", emps.updated_by);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public static List<company> SearchCompanyByID(int userid)
+        {
+            DataTable dt = new DataTable();
+            List<company> objuserlist = new List<company>();
+            try
+            {
+                SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+                SqlCommand cmd = new SqlCommand("sp_company_select", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id", userid);
+                con.Open();
+                dt.Load(cmd.ExecuteReader());
+                con.Close();
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    objuserlist.Add(new company
+                    {
+                        id = Convert.ToInt32(dt.Rows[i]["id"]),
+                        country = Convert.ToInt32(dt.Rows[i]["country"]),
+                        province = Convert.ToInt32(dt.Rows[i]["province"]),
+                        district = Convert.ToInt32(dt.Rows[i]["district"]),
+                        city_state = Convert.ToInt32(dt.Rows[i]["city_state"]),
+                        company_name = Convert.ToString(dt.Rows[i]["company_name"]),
+                        email = Convert.ToString(dt.Rows[i]["email"]),
+                        transation_type = Convert.ToString(dt.Rows[i]["transation_type"]),
+                        address = Convert.ToString(dt.Rows[i]["address"]),
+                        tax_id= Convert.ToString(dt.Rows[i]["tax_id"]),
+                        license_no = Convert.ToString(dt.Rows[i]["license_no"]),
+                        commertial_records = Convert.ToString(dt.Rows[i]["commertial_records"]),
+                        fax = Convert.ToString(dt.Rows[i]["fax"]),
+                        mobile = Convert.ToString(dt.Rows[i]["mobile"]),
+                        phone = Convert.ToString(dt.Rows[i]["phone"]),
+                        iata = Convert.ToString(dt.Rows[i]["iata"]),
+                        logo = Convert.ToString(dt.Rows[i]["logo"]),
+                        
+                    });
+                }
+                return objuserlist;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                dt.Dispose();
+            }
+        }
+
+        public void DeleteComapny(int id, int userid)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            try
+            {
+
+                SqlCommand cmd = new SqlCommand("sp_delete_company", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@created_by", userid);
+                cmd.Parameters.AddWithValue("@updated_by", userid);
+                con.Open();
+                cmd.ExecuteNonQuery();
+                con.Close();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+    }
+}

@@ -1,0 +1,540 @@
+@{
+    ViewBag.Title = "AddCompany";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Scripts/adminlte/plugins/toastr/toastr.css" rel="stylesheet" />
+
+<div class="content-wrapper">
+    @*<div class="row">
+            <div class="col-md-12 col-xs-12">
+                <ol class="breadcrumb">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">User Management</a></li>
+                    <li class="active h1Header">Add User</li>
+                </ol>
+            </div>
+        </div>*@
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1 class="h1Header">
+            Add Company
+        </h1>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-6">
+                <!-- general form elements -->
+                <div class="box box-primary">
+                    <div class="box-body">
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Company Name</label>
+                            <input type="text" id="txtCompanyname" class="form-control chkRequired" placeholder="Company Name" />
+                            <input type="hidden" id="hdnUserid" value="0" />
+                            <input type="hidden" id="hdnimagename" value="" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Address</label>
+                            <input type="text" id="txtAddress" class="form-control" placeholder="Address" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Country</label>
+                            @*to bind dropdown from viewbag below code is used*@
+                            @*@Html.DropDownList("VwCountryList", (IEnumerable<SelectListItem>)ViewBag.VwCountryList, new { @class = "form-control select2 chkRequired" })*@
+
+                            @Html.DropDownList("VwCountriesList", (IEnumerable<SelectListItem>)ViewBag.VwCountriesList, new { @class = "form-control chkRequired", onchange = "bindstate(VwCountriesList.value)" })
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Province</label>
+                            @*to bind dropdown from viewbag below code is used*@
+                            @*@Html.DropDownList("VwProvinceList", (IEnumerable<SelectListItem>)ViewBag.VwProvinceList, new { @class = "form-control select2 chkRequired" })*@
+                            @Html.DropDownList("ddlstate", (IEnumerable<SelectListItem>)ViewBag.VwProvincesList, new { @class = "form-control chkRequired", onchange = "bindcity(ddlstate.value)" })
+
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">District</label>
+                            @*to bind dropdown from viewbag below code is used*@
+                            @*@Html.DropDownList("VwProvinceList", (IEnumerable<SelectListItem>)ViewBag.VwProvinceList, new { @class = "form-control select2 chkRequired" })*@
+                            @Html.DropDownList("ddldistrict", (IEnumerable<SelectListItem>)ViewBag.VwDistrictsList, new { @class = "form-control chkRequired" })
+
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">City</label>
+                            @*to bind dropdown from viewbag below code is used*@
+                            @*@Html.DropDownList("VwcityList", (IEnumerable<SelectListItem>)ViewBag.VwcityList, new { @class = "form-control select2 chkRequired" })*@
+                            @Html.DropDownList("ddlcity", (IEnumerable<SelectListItem>)ViewBag.VwCitiesList, new { @class = "form-control chkRequired" })
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Phone</label>
+                            <input type="text" maxlength="10" class="form-control" onkeypress="return isNumber(event)" id="txtContact1" placeholder="Phone Number" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Fax</label>
+                            <input type="text" id="txtFax" class="form-control chkRequired" placeholder="Fax" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Mobile</label>
+                            <input type="text" maxlength="10" class="form-control" onkeypress="return isNumber(event)" id="txtContact2" placeholder="Mobile Number" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Email</label>
+                            <input type="email" class="form-control chkRequired chkEmailValidation" id="txtEmail" placeholder="Email" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Transation Type</label>
+                            <input type="text" id="txtTransation" class="form-control chkRequired" placeholder="Transation Type" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Tax ID</label>
+                            <input type="text" id="txtTax" class="form-control chkRequired" placeholder="Tax ID" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">License Number</label>
+                            <input type="text" id="txtLicense" class="form-control chkRequired" placeholder="License Number" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">IATA</label>
+                            <input type="text" id="txtIATA" class="form-control chkRequired" placeholder="IATA" />
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Commertial Record</label>
+                            <input type="text" id="txtCommertial" class="form-control chkRequired" placeholder="Commertial Record" />
+                        </div>
+                    </div>
+
+                    <!-- /.box-body -->
+                    <div class="box-footer">
+                        <button type="button" id="btnsave" class="btn btn-primary">Save</button>
+                        <button type="button" onclick="Redirect()" class="btn btn-danger">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <!-- general form elements -->
+                <div class="box-primary">
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    <div class="box-body">
+                        <div class="form-group">
+                            <img id="imgProfilePic" width="150" height="200">
+                            <br />
+                            <br />
+                            <input type="file" id="fuProfilePic" accept="image/*" onchange="readURL(this)">
+                            <br />
+                            <button type="button" class="btn btn-danger" id="btnDeleteprofilepic">Delete Photo</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!--/.col (left) -->
+        </div>
+        <!-- /.row -->
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+@section Scripts
+{
+    <script src="~/Scripts/adminlte/plugins/toastr/toastr.js"></script>
+    <script type="text/javascript">
+         function checksession() {
+            $.ajax({
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                url: '/Login/checkSession',
+                data: '{}',
+                success: function (data) {
+                    //if data == false then session has expired and it will redirect to login
+                        if (data == false) {
+                        location.href = "/login/Login"
+                    }
+                },
+                error: function (xhr) {
+                      try {
+                        result = JSON.parse(result);
+                    } catch (e) {
+                        var elements = $(result);
+                        var found = $('#isunauthorized', elements);
+                        // to check that user has rights for this page access
+                        if (found.length > 0) {
+                            window.location.href = "/login/UnAuthorized";
+                        }
+                    }
+                }
+            });
+        }
+        $(document).ready(function () {
+    //this function is used to check session
+    checksession();
+            $('input[type="checkbox"].minimal, input[type="radio"].minimal').iCheck({
+                checkboxClass: 'icheckbox_minimal-blue',
+                radioClass: 'iradio_minimal-blue'
+            });
+            //Initialize Select2 Elements
+            getUserdetails();
+            $('.select2').select2();
+        });
+        $('#btnsave').click(function () {
+            $('#divLoader').show();
+            debugger;
+          //  $('#divLoader').show();
+    // to check for require validation
+    if (requirevalidation()) {
+        //check for email validation
+        if (EmailValidation()) {
+                var fileUpload = $("#fuProfilePic").get(0);
+                var files = fileUpload.files;
+                var fileData = new FormData();
+            if (files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    fileData.append(files[i].name, files[i]);
+                }
+            }
+            else {
+             //  $('#divLoader').show();
+                fileData.append("logo", $('#hdnimagename').val());
+            }
+            fileData.append("id", $('#hdnUserid').val());
+            fileData.append("company_name", $('#txtCompanyname').val());
+            fileData.append("address", $('#txtAddress').val().trim());
+            fileData.append("country", $('#VwCountriesList').val());
+            fileData.append("province", $('#ddlstate').val().trim());
+            fileData.append("district", $('#ddldistrict').val().trim());
+            fileData.append("city_state", $('#ddlcity').val().trim());
+            fileData.append("phone", $('#txtContact1').val().trim());
+            fileData.append("email", $('#txtEmail').val().trim());
+            fileData.append("fax", $('#txtFax').val().trim());
+            fileData.append("mobile", $('#txtContact2').val().trim());
+            fileData.append("transation_type", $('#txtTransation').val().trim());
+            fileData.append("tax_id", $('#txtTax').val().trim());
+            fileData.append("license_no", $('#txtLicense').val().trim());
+            fileData.append("iata", $('#txtIATA').val().trim());    
+            fileData.append("commertial_records", $('#txtCommertial').val().trim());
+
+                $.ajax({
+                    url: "/Company/SaveCompanyDetails",
+                    type: "POST",
+                    contentType: false,
+                    processData: false,
+                    data: fileData,
+                    success: function (result, status, xhr) {
+                        var obj = JSON.parse(result);
+                        // to check that obj is not null
+                        if (obj != null) {
+                            // to check that image is not null and not blank
+                            if (obj.image != "" && obj.image != null) {
+                                $('#imgProfilePic').attr('src', obj.image);
+                                $('#hdnimagename').val(obj.imagename);
+                            }
+                        }
+                        //if value is 0 then inserted else updated
+                        if ($('#hdnUserid').val() == "0") {
+                            toastr.remove();
+                            toastr.success('Company added successfully.');
+                            ClearForm();
+                            window.location.href = "/Company/Index";
+                        }
+                        else {
+                            toastr.remove();
+                            toastr.success('company updated successfully.');
+                            window.location.href = "/Company/Index";
+                        }
+                    }
+                    ,
+                    complete: function () {
+                        $('#divLoader').hide();
+                    }
+                });
+                }
+            }
+        });
+        function getUserdetails() {
+            var url = window.location.href;
+            var id = url.substring(url.lastIndexOf('/') + 1);
+            var fileData = new FormData();
+            fileData.append("urlstr", id);
+            $.ajax({
+                url: "/Company/getuserdetails",
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: fileData,
+                success: function (result, status, xhr) {
+                    var obj = null;
+                    try {
+                        obj = JSON.parse(result);
+                    } catch (e) {
+                        var elements = $(result);
+                        var found = $('#isunauthorized', elements);
+                        // to check that user has rights for this page access
+                        if (found.length > 0) {
+                            window.location.href = "/login/UnAuthorized";
+                        }
+                    }
+                    // to check that result is not blank
+                    if (result != "") {
+                        // check that obj is not null
+                        if (obj != null && obj.length > 0) {
+                            $('.h1Header').text("Edit User");
+                            $('#txtCompanyname').val(obj[0].company_name);
+                            $('#txtAddress').val(obj[0].address);
+                            $('#VwCountriesList').val(obj[0].country);
+                            $('#ddlstate').val(obj[0].province);
+                            $('#ddldistrict').val(obj[0].district);
+                            $('#ddlcity').val(obj[0].city_state);
+                            $('#txtContact1').val(obj[0].phone);
+                            $('#txtEmail').val(obj[0].email);
+                            $('#txtFax').val(obj[0].fax);
+                            $('#txtContact2').val(obj[0].mobile);
+                            $('#txtTransation').val(obj[0].transation_type);
+                            $('#txtTax').val(obj[0].tax_id);
+                            $('#txtLicense').val(obj[0].license_no);
+                            $('#txtIATA').val(obj[0].iata);
+                            $('#txtCommertial').val(obj[0].commertial_records);
+                            $('#hdnUserid').val(obj[0].id);
+                            $('#imgProfilePic').attr('src', obj[0].logo);
+                            $('#hdnimagename').val(obj[0].picname);
+                        }
+                    }
+                },
+                complete: function () {
+                    $('.select2').select2();
+                },
+                error: function () {
+                }
+            });
+        }
+       
+        function requirevalidation() {
+            var count = 0;
+               $(".chkRequired").each(function () {
+                //check that textbox is blank or null
+                  if ($(this).val() == "" || $(this).val() == '' || $(this).val() == null || $(this).val() == "0" || $(this).val() == 0) {
+                    $(this).prev('label').addClass('text-danger');
+                    if ($(this).prev('label').text() == "") {
+                        $(this).parent().find('label').addClass('text-danger');
+                    }
+                    count = 1;
+                }
+                else {
+                    $(this).prev('label').removeClass('text-danger');
+                    if ($(this).prev('label').text() == "") {
+                        $(this).parent().find('label').removeClass('text-danger');
+                    }
+                }
+            });
+    //if count is 0 then validation is true else false
+    if (count != 0) {
+                toastr.remove();
+                toastr.error('All fields in red are required.');
+                $('#divLoader').hide();
+                return false;
+            }
+            else {
+                $('#divLoader').hide();
+                return true;
+            }
+        }
+        function isNumber(evt) {
+            evt = (evt) ? evt : window.event;
+            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            // to allow only numeric value
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+            return true;
+        }
+        $('#btnDeleteprofilepic').click(function () {
+            $('#imgProfilePic').attr('src', '~/../../../Content/adminlte/img/nouser.jpg');
+            $('#hdnimagename').val('');
+            $('#fuProfilePic').val('');
+        });
+        function Redirect() {
+            window.location.href = "/Company/Index";
+        }
+        function readURL(input) {
+    // to check that file is selected
+            if (input.files && input.files[0]) {
+                var image = input.files[0].name.split('.').pop().toLowerCase();
+                if ($.inArray(image, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+                    $(input).val("");
+                    toastr.remove();
+                    toastr.error('Please select png,jpg,jpeg files!');
+                }
+                // condition for 4 md image size
+                else if (input.files[0].size <= 4000000) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#imgProfilePic')
+                            .attr('src', e.target.result)
+                            .width(150)
+                            .height(200);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+                else {
+                    toastr.remove();
+                    toastr.error('File size should be less than 4 MB!');
+                    $(input).val("");
+                }
+            }
+        }
+        function EmailValidation() {
+            var count = 0;
+            $(".chkEmailValidation").each(function () {
+                var emailReg = /^([\w-\.]+@@([\w-]+\.)+[\w-]{2,4})?$/;
+    // to check that email entered is valid or not
+    if (!emailReg.test($(this).val())) {
+                    $(this).prev('label').addClass('text-danger');
+                    count = 1;
+                }
+                else {
+                    $(this).prev('label').removeClass('text-danger');
+                }
+            });
+    //if count is 0 then validation is true else false
+    if (count != 0) {
+                toastr.remove();
+                toastr.error('Please enter valid email address.');
+                $('#divLoader').hide();
+                return false;
+            }
+            else {
+                $('#divLoader').hide();
+                return true;
+            }
+        }
+        function ClearForm() {
+            $('#txtCompanyname').val("");
+            $('#txtAddress').val("");
+            $('#VwCountryList').val("");
+            $('#VwProvinceList').val("");
+            $('#VwcityList').val("");
+            $('#txtContact1').val("");
+            $('#txtEmail').val("");
+            $('#txtFax').val("");
+            $('#txtContact2').val("");
+            $('#txtTransation').val("");
+            $('#txtTax').val("");
+            $('#txtLicense').val("");
+            $('#txtIATA').val("");
+            $('#fuProfilePic').val("");
+            $('#txtCommertial').val("");   
+            $('#hdnUserid').val("");
+            $('#imgProfilePic').attr('src', "");
+            $('#hdnimagename').val("");
+        }
+   
+    
+         
+        function bindstate(id) {
+            debugger;
+            var fileData = new FormData();
+            fileData.append("CountryId", id);
+            //$("#ddlstate").empty();
+            $.ajax({
+                url: "/Company/BindStateByCountry",
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: fileData,
+                //async: false,
+                success: function (result, status, xhr) {
+                    debugger;
+                    var obj = null;
+                    if (result != "") {
+                        obj = JSON.parse(result);
+                        $("#ddlstate").empty();
+                        $("#ddlcity").empty();
+                        $("#ddldistrict").empty();
+                        $("#ddlstate").append($('<option/>').attr("value", 0).text('--select state--'));
+                        for (var i = 0; i < obj.length; i++) {
+                            $("#ddlstate").append($('<option/>').attr("value", obj[i].Id).text(obj[i].ProvinceName));
+                        }
+                    }
+                    else {
+                        $("#ddlstate").empty();
+                        $("#ddlcity").empty();
+                        $("#ddldistrict").empty();
+                        $("#ddlstate").append($('<option/>').attr("value", 0).text('--select state--'));
+                        $("#ddlcity").append($('<option/>').attr("value", 0).text('--select city--'));
+                        $("#ddldistrict").append($('<option/>').attr("value", 0).text('--select district--'));
+                    }
+                },
+                error: function () {
+                    alert('State bind error  !!');
+                }
+            });
+        }
+
+        function bindcity(id) {
+            debugger;
+            var fileData = new FormData();
+            fileData.append("ProvinceId", id);
+              binddistrict(id);   
+            $.ajax({
+                url: "/Company/BindCityByState",
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: fileData,
+                success: function (result) {
+                    var obj = null;
+                    if (result != "") {
+                        obj = JSON.parse(result);
+                        $("#ddlcity").empty();
+                        $("#ddlcity").append($('<option/>').attr("value", 0).text('--select city--'));
+                        for (var i = 0; i < obj.length; i++) {
+                            $("#ddlcity").append($('<option/>').attr("value", obj[i].Id).text(obj[i].CityName));
+                        }
+                    }
+                    else {
+                        $("#ddlcity").empty();
+                        $("#ddlcity").append($('<option/>').attr("value", 0).text('--select city--'));
+                    }
+                },
+                error: function () {
+                    alert('City bind error  !!');
+                }
+            });
+        }
+
+        function binddistrict(id) {
+            debugger;
+            var fileData = new FormData();
+            fileData.append("ProvinceId", id);
+            $.ajax({
+                url: "/Company/BindDitrictByState",
+                type: "POST",
+                contentType: false,
+                processData: false,
+                data: fileData,
+                success: function (result) {
+                    var obj = null;
+
+                    if (result != "") {
+                        obj = JSON.parse(result);
+                        $("#ddldistrict").empty();
+                        $("#ddldistrict").append($('<option/>').attr("value", 0).text('--select district--'));
+                        for (var i = 0; i < obj.length; i++) {
+                            $("#ddldistrict").append($('<option/>').attr("value", obj[i].Id).text(obj[i].DistrictName));
+                        }
+                    }
+                    else {
+                        $("#ddldistrict").empty();
+                        $("#ddldistrict").append($('<option/>').attr("value", 0).text('--select district--'));
+                    }
+                },
+                error: function () {
+                    alert('district bind error  !!');
+                }
+            });
+        }
+
+    </script>
+}
+

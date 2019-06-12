@@ -1,0 +1,12 @@
+ALTER PROCEDURE [dbo].[GetActivatedProvincebyCountryId]
+@Id int=0,
+@ProvinceName varchar(50)=null,
+@updateDate datetime =null,
+@UpdateBy int=0,
+@CountryId int =0
+AS
+begin
+
+ SELECT Id,ProvinceName from Provinces where CountryId=@CountryId
+
+end

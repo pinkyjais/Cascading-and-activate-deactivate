@@ -1,0 +1,12 @@
+
+Create PROCEDURE [dbo].[GetDeactivatedCountry]
+@Id int=0,
+@CountryName varchar(50)=null,
+@updateDate datetime =null,
+@UpdateBy int=0
+AS
+begin
+Update Countries 
+set 
+IsActive='false',IsDelete='true' where Id=@Id  AND IsDelete='false' AND IsActive='True'
+end

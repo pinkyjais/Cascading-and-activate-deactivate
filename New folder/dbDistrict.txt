@@ -1,0 +1,191 @@
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using static adminlte.Models.District;
+
+namespace adminlte.Classes
+{
+    public class dbDistrict
+    {
+
+          public static List<district> SearchdistrictList()
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            DataTable dt = new DataTable();
+            List<district> objdistrictlist = new List<district>();
+            try
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("SP_District", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@action", "DistrictList");
+                dt.Load(cmd.ExecuteReader());
+                for (int i = 0; i < dt.Rows.Count; i++)
+                {
+                    objdistrictlist.Add(new district
+                    {
+                        Id = Convert.ToInt32(dt.Rows[i]["Id"]),
+                        DistrictId = Convert.ToInt32(dt.Rows[i]["Id"]),
+                        DistrictName = Convert.ToString(dt.Rows[i]["DistrictName"]),
+                        ProvinceName = Convert.ToString(dt.Rows[i]["ProvinceName"]),
+                        CountryName = Convert.ToString(dt.Rows[i]["CountryName"]),
+                        IsDelete = Convert.ToString(dt.Rows[i]["IsDelete"]),
+                        IsActive = Convert.ToString(dt.Rows[i]["IsActive"]),
+
+                    });
+                }
+                return objdistrictlist;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            finally
+            {
+                dt.Dispose();
+            }
+        }
+
+        public DataSet CheckDuplicateData(district objdistrict)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("Sp_District", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@action", "checkduplicatedata");
+            // cmd.Parameters.AddWithValue("@CountryId", objdistrict.CountryId);
+            cmd.Parameters.AddWithValue("@DistrictName", objdistrict.DistrictName);
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            adpt.Fill(ds);
+            return ds;
+        }
+
+        
+        public bool InsertData(district objcountry)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("Sp_District", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@action", "InsertDistrict");
+                cmd.Parameters.AddWithValue("@ProvinceId", objcountry.ProvinceId);
+                cmd.Parameters.AddWithValue("@DistrictName", objcountry.DistrictName);
+                cmd.Parameters.AddWithValue("@CreatedBy", objcountry.CreatedBy);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public DataSet SearchDataForUpdate(int id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("SP_District_Edit", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            //cmd.Parameters.AddWithValue("@action", "selectById");
+            cmd.Parameters.AddWithValue("@Id", id);
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            adpt.Fill(ds);
+            return ds;
+        }
+
+        public bool UpdateData(district objUser)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("SP_District_Update", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                //cmd.Parameters.AddWithValue("@action", "UpdateProvince");
+                cmd.Parameters.AddWithValue("@Id", objUser.Id);
+                cmd.Parameters.AddWithValue("@DistrictName", objUser.DistrictName);
+                cmd.Parameters.AddWithValue("@ProvinceId", objUser.ProvinceId);
+                cmd.Parameters.AddWithValue("@UpdatedBy", objUser.UpdateId);
+                cmd.Parameters.AddWithValue("@UpdatedDate", DateTime.Now);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public DataSet SearchUserForUpdate(int id)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            SqlCommand cmd = new SqlCommand("SP_Province", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@action", "selectById");
+            cmd.Parameters.AddWithValue("@Id", id);
+            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+            DataSet ds = new DataSet();
+            adpt.Fill(ds);
+            return ds;
+        }
+
+        public bool makeDeactivateData(district objdistrict)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("GetDeactivatedDistrict", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Id", objdistrict.Id);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public bool makeActivateData(district objdistrict)
+        {
+            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["Connection"].ConnectionString);
+            bool isAvailable = false;
+            try
+            {
+                SqlCommand cmd = new SqlCommand("ActivateDeactivatedDistrict", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Id", objdistrict.Id);
+                con.Open();
+                isAvailable = Convert.ToBoolean(cmd.ExecuteNonQuery());
+                con.Close();
+                return isAvailable;
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+    }
+}

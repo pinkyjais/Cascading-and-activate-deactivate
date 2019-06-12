@@ -1,0 +1,64 @@
+Create PROCEDURE [dbo].[SP_Country]
+@Id int=0,
+@CountryName varchar(50)='',
+@CreatedBy int=0,
+@UpdatedBy int=0,
+@action varchar(50)=''
+AS
+BEGIN
+	if(@action='CountryList')
+	BEGIN
+	SELECT  [Id]
+      ,[CountryName]
+      ,[CreatedBy]
+      ,[CreatedDate]
+      ,[UpdatedBy]
+      ,[UpdaatedDate]
+      ,[IsActive]
+      ,[IsDelete]
+  FROM [dbo].[Countries] 
+  --where IsDelete='False' and IsActive='True'
+	END
+
+	if(@action='checkduplicatedata')
+	BEGIN
+		SELECT  [Id]
+		,[CountryName]
+      
+	  FROM [dbo].[Countries] where CountryName LIKE '%'+@CountryName+'%' and IsDelete='False'
+		END
+
+		if(@action='InsertCountry')
+	BEGIN
+		Insert into Countries (CountryName,CreatedBy,CreatedDate,UpdatedBy,UpdaatedDate,IsActive,IsDelete)
+	values(@CountryName,@CreatedBy,GETDATE(),@UpdatedBy,GETDATE(),'True','False')
+		END
+		IF (@Action = 'Selectlist')  
+BEGIN  
+SELECT *  
+FROM Countries  
+END
+	IF (@Action = 'getdatabyid')  
+BEGIN  
+SELECT *  
+FROM Countries  where Id=@Id
+end
+
+IF (@Action = 'UpdateCountry')
+SET NOCOUNT ON
+DECLARE @IsExist int;
+set @IsExist = (select COUNT(Id) FROM [dbo].[Countries] WHERE [Id]=@Id)
+if(@IsExist=1)
+BEGIN
+UPDATE [dbo].[Countries]
+SET
+	CountryName = @CountryName,
+	UpdatedBy = @UpdatedBy,
+	UpdaatedDate = GETDATE(),
+	[IsActive] = 1,
+	[IsDelete] = 0 
+WHERE Id = @Id
+END
+end
+
+
